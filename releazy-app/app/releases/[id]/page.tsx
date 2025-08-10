@@ -10,7 +10,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, ClipboardList } from 'lucide-react';
+import { ReleaseLogDialog } from '@/components/release-log-dialog';
 
 export default function ReleaseDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -35,8 +36,22 @@ export default function ReleaseDetailPage() {
             <DropdownMenuItem onClick={() => console.log('Cancel release clicked')}>
               Cancel Release
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => console.log('Release log clicked')}>
-              Release Log
+            <DropdownMenuItem asChild>
+              <ReleaseLogDialog 
+                releaseId={Array.isArray(id) ? id[0] : id}
+                releaseName={name}
+                activity={[
+                  { at: 'Aug 07, 10:21', who: 'SecOps Bot', action: 'Security checks queued (SAST, DAST).' },
+                  { at: 'Aug 06, 16:03', who: 'Alex Kim', action: 'Moved Testing to In Progress.' },
+                  { at: 'Aug 05, 09:47', who: 'QA Payments', action: 'Attached test plan v2.' },
+                  { at: 'Aug 04, 11:20', who: 'Release Eng', action: `Created release ${Array.isArray(id) ? id[0] : id}.` },
+                ]}
+              >
+                <div className="flex items-center gap-2 w-full">
+                  <ClipboardList className="h-4 w-4" />
+                  <span>Release Log</span>
+                </div>
+              </ReleaseLogDialog>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
