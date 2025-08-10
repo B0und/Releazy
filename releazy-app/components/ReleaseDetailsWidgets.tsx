@@ -42,12 +42,10 @@ const MOCK_RELEASE: Release = {
   target: 'Aug 10, 2025',
   risk: 'Medium Risk',
   steps: [
-    { id: 'ticket', name: 'Jira Ticket Selection', owner: 'Alex Kim', status: 'done' },
-    { id: 'dev', name: 'Development', owner: 'Team Payments', status: 'done' },
+    { id: 'ticket', name: 'Release creation', owner: 'Alex Kim', status: 'done' },
+    { id: 'dev', name: 'Stabilization', owner: 'Team Payments', status: 'done' },
     { id: 'test', name: 'Testing', owner: 'QA Payments', status: 'in-progress' },
-    { id: 'sec', name: 'Security Review', owner: 'SecOps', status: 'blocked' },
-    { id: 'stage', name: 'Staging', owner: 'DevOps', status: 'todo' },
-    { id: 'deploy', name: 'Deploy', owner: 'Release Eng', status: 'todo' },
+    { id: 'sec', name: 'Production deploy', owner: 'SecOps', status: 'blocked' },
   ],
   tickets: [
     { id: 'PAY-9812', summary: 'Add 3DS2 fallback for EU markets', status: 'In Progress' },
