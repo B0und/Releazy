@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { LayoutDashboard, ListTree, Layers, Settings, ChevronLeft, GitMerge } from 'lucide-react';
-import Image from 'next/image';
+import { JiraSettingsDialog } from '@/components/jira-settings-dialog';
 
 type AppShellProps = {
   children?: React.ReactNode;
@@ -70,13 +70,16 @@ export function AppShell({
           </nav>
           <div className="mt-auto">
             <Separator className="my-4" />
-            <Link
-              href="/settings"
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-            >
-              <Settings className="h-4 w-4" />
-              Settings
-            </Link>
+            <JiraSettingsDialog 
+              trigger={
+                <button
+                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                >
+                  <Settings className="h-4 w-4" />
+                  Settings
+                </button>
+              }
+            />
           </div>
         </aside>
 
