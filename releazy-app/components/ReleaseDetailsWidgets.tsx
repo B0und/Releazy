@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { notFound } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -56,7 +56,7 @@ const MOCK_RELEASE: Release = {
   ],
 };
 
-const suggestionData = [
+const initialSuggestionData = [
   {
     id: 'PAY-9841',
     summary: 'Handle network retries for issuer timeouts',
@@ -72,10 +72,11 @@ const suggestionData = [
 // Activity data moved to release-log-dialog component
 
 export default function ReleaseDetailsWidgets({ params }: { params: { id: string } }) {
-  const release = useMemo(() => {
+  const [release, setRelease] = useState<Release>(() => {
     const releaseId = Array.isArray(params.id) ? params.id[0] : params.id;
     return releaseId === MOCK_RELEASE.id ? MOCK_RELEASE : MOCK_RELEASE;
-  }, [params.id]);
+  });
+  const [suggestions, setSuggestions] = useState(initialSuggestionData);
   const [activeStep, setActiveStep] = useState<string>(
     release?.steps.find((s) => s.status === 'in-progress')?.id ?? 'ticket'
   );
@@ -142,23 +143,39 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
               </div>
 
               {/* AI Suggestions */}
-              <div className="rounded-lg border bg-muted/40 p-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="h-4 w-4 text-purple-500" />
-                  <div className="text-sm font-medium">AI Suggestions</div>
+              {suggestions.length > 0 && (
+                <div className="rounded-lg border bg-muted/40 p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles className="h-4 w-4 text-purple-500" />
+                    <div className="text-sm font-medium">AI Suggestions</div>
+                  </div>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {suggestions.map((s) => (
+                      <AISuggestionCard
+                        key={s.id}
+                        id={s.id}
+                        summary={s.summary}
+                        why={s.why}
+                        onAdd={() => {
+                          // Add to tickets
+                          setRelease((prev) => ({
+                            ...prev,
+                            tickets: [
+                              ...prev.tickets,
+                              { id: s.id, summary: s.summary, status: 'To Do' }
+                            ]
+                          }));
+                          
+                          // Remove from suggestions
+                          setSuggestions((prev) => 
+                            prev.filter((suggestion) => suggestion.id !== s.id)
+                          );
+                        }}
+                      />
+                    ))}
+                  </div>
                 </div>
-                <div className="grid sm:grid-cols-2 gap-3">
-                  {suggestionData.map((s) => (
-                    <AISuggestionCard
-                      key={s.id}
-                      id={s.id}
-                      summary={s.summary}
-                      why={s.why}
-                      onAdd={() => {}}
-                    />
-                  ))}
-                </div>
-              </div>
+              )}
 
               {/* Manual Search */}
               <Collapsible>
