@@ -114,13 +114,13 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
               {/* Included Tickets */}
               <div>
                 <div className="font-medium mb-2">Included Tickets</div>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Summary</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Remove</TableHead>
+                <Table className="border rounded-md overflow-hidden">
+                  <TableHeader className="bg-muted">
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead className="font-semibold">ID</TableHead>
+                      <TableHead className="font-semibold">Summary</TableHead>
+                      <TableHead className="font-semibold">Status</TableHead>
+                      <TableHead className="text-right font-semibold">Remove</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -129,18 +129,28 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
                       const isNewlyAdded = index === release.tickets.length - 1 && 
                                           suggestions.length > 0;
                       
+                      // Determine status color
+                      const statusColor = 
+                        t.status === 'Done' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' :
+                        t.status === 'In Progress' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' :
+                        'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+                      
                       return (
                         <TableRow 
                           key={t.id}
-                          className={isNewlyAdded ? "animate-in fade-in slide-in-from-bottom-2 duration-500" : ""}
+                          className={`${isNewlyAdded ? "animate-in fade-in slide-in-from-bottom-2 duration-500" : ""} 
+                                     ${index % 2 === 0 ? "bg-white dark:bg-gray-950" : "bg-gray-50 dark:bg-gray-900"}
+                                     transition-colors hover:bg-gray-100 dark:hover:bg-gray-800`}
                         >
-                          <TableCell className="font-medium">{t.id}</TableCell>
-                          <TableCell>{t.summary}</TableCell>
+                          <TableCell className="font-medium text-primary">{t.id}</TableCell>
+                          <TableCell className="max-w-md truncate">{t.summary}</TableCell>
                           <TableCell>
-                            <Badge variant="secondary">{t.status}</Badge>
+                            <Badge className={`${statusColor} font-medium`} variant="outline">
+                              {t.status}
+                            </Badge>
                           </TableCell>
                           <TableCell className="text-right">
-                            <Button size="sm" variant="ghost">
+                            <Button size="sm" variant="ghost" className="hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900">
                               Remove
                             </Button>
                           </TableCell>
@@ -153,19 +163,21 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
 
               {/* AI Suggestions */}
               {suggestions.length > 0 && (
-                <div className="rounded-lg border bg-muted/40 p-3 animate-in fade-in duration-300">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="h-4 w-4 text-purple-500" />
-                    <div className="text-sm font-medium">AI Suggestions</div>
+                <div className="rounded-lg border border-purple-200 dark:border-purple-900 bg-gradient-to-r from-purple-50/50 to-white dark:from-purple-950/20 dark:to-gray-950 p-4 shadow-sm animate-in fade-in duration-300">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="bg-purple-100 dark:bg-purple-900 p-1.5 rounded-full">
+                      <Sparkles className="h-4 w-4 text-purple-600 dark:text-purple-300" />
+                    </div>
+                    <div className="text-sm font-semibold text-purple-700 dark:text-purple-300">AI Suggestions</div>
                   </div>
-                  <div className="grid sm:grid-cols-2 gap-3">
+                  <div className="grid sm:grid-cols-2 gap-4">
                     {suggestions.map((s) => (
                       <AISuggestionCard
                         key={s.id}
                         id={s.id}
                         summary={s.summary}
                         why={s.why}
-                        onAdd={() => {
+                        onAddAction={() => {
                           // Add to tickets with animation
                           const newTicket = { id: s.id, summary: s.summary, status: 'To Do' as const };
                           setRelease((prev) => ({
@@ -204,14 +216,14 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
                     <Input placeholder="Status (e.g., In Progress)" />
                     <Input placeholder="JQL (advanced)" className="md:col-span-3" />
                   </div>
-                  <div className="rounded-md border">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>ID</TableHead>
-                          <TableHead>Summary</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead className="text-right">Add</TableHead>
+                  <div className="rounded-md overflow-hidden">
+                    <Table className="border">
+                      <TableHeader className="bg-muted">
+                        <TableRow className="hover:bg-transparent">
+                          <TableHead className="font-semibold">ID</TableHead>
+                          <TableHead className="font-semibold">Summary</TableHead>
+                          <TableHead className="font-semibold">Status</TableHead>
+                          <TableHead className="text-right font-semibold">Add</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -226,18 +238,32 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
                             summary: 'Alert on chargeback anomalies',
                             status: 'In Progress',
                           },
-                        ].map((r) => (
-                          <TableRow key={r.id}>
-                            <TableCell className="font-medium">{r.id}</TableCell>
-                            <TableCell>{r.summary}</TableCell>
-                            <TableCell>
-                              <Badge variant="secondary">{r.status}</Badge>
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <Button size="sm">Add</Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                        ].map((r, index) => {
+                          // Determine status color
+                          const statusColor = 
+                            r.status === 'Done' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' :
+                            r.status === 'In Progress' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' :
+                            'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+                          
+                          return (
+                            <TableRow 
+                              key={r.id}
+                              className={`${index % 2 === 0 ? "bg-white dark:bg-gray-950" : "bg-gray-50 dark:bg-gray-900"}
+                                         transition-colors hover:bg-gray-100 dark:hover:bg-gray-800`}
+                            >
+                              <TableCell className="font-medium text-primary">{r.id}</TableCell>
+                              <TableCell className="max-w-md truncate">{r.summary}</TableCell>
+                              <TableCell>
+                                <Badge className={`${statusColor} font-medium`} variant="outline">
+                                  {r.status}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <Button size="sm" className="bg-primary hover:bg-primary/90">Add</Button>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
                       </TableBody>
                     </Table>
                   </div>
@@ -246,7 +272,7 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
             </>
           ) : (
             <div className="text-sm text-muted-foreground">
-              Select "Jira Ticket Selection" to manage tickets for this release. Other steps will
+              Select &quot;Jira Ticket Selection&quot; to manage tickets for this release. Other steps will
               show their respective details here.
             </div>
           )}
