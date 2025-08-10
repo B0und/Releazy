@@ -4,9 +4,6 @@ import { useMemo, useState } from 'react';
 import { notFound } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -72,12 +69,7 @@ const suggestionData = [
   },
 ];
 
-const activity = [
-  { at: 'Aug 07, 10:21', who: 'SecOps Bot', action: 'Security checks queued (SAST, DAST).' },
-  { at: 'Aug 06, 16:03', who: 'Alex Kim', action: 'Moved Testing to In Progress.' },
-  { at: 'Aug 05, 09:47', who: 'QA Payments', action: 'Attached test plan v2.' },
-  { at: 'Aug 04, 11:20', who: 'Release Eng', action: 'Created release REL-2381.' },
-];
+// Activity data moved to release-log-dialog component
 
 export default function ReleaseDetailsWidgets({ params }: { params: { id: string } }) {
   const release = useMemo(() => {
@@ -87,12 +79,8 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
   const [activeStep, setActiveStep] = useState<string>(
     release?.steps.find((s) => s.status === 'in-progress')?.id ?? 'ticket'
   );
-  const [comment, setComment] = useState<string>('');
 
   if (!release) return notFound();
-
-  const completed = release.steps.filter((s) => s.status === 'done').length;
-  const pct = Math.round((completed / release.steps.length) * 100);
 
   const active = release.steps.find((s) => s.id === activeStep) ?? release.steps[0];
 
@@ -238,69 +226,7 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
         </CardContent>
       </Card>
 
-      {/* Activity & Comments */}
-      <Card className="lg:col-span-2">
-        <CardHeader className="pb-2">
-          <CardTitle>History & Collaboration</CardTitle>
-          <CardDescription>Immutable activity log and comments</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="activity">
-            <TabsList>
-              <TabsTrigger value="activity">Activity Log</TabsTrigger>
-              <TabsTrigger value="comments">Comments</TabsTrigger>
-            </TabsList>
-            <TabsContent value="activity" className="mt-4">
-              <div className="space-y-3">
-                {activity.map((a, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <div className="h-2.5 w-2.5 rounded-full bg-foreground/70 mt-1.5" />
-                    <div>
-                      <div className="text-sm">
-                        <span className="font-medium">{a.who}</span>{' '}
-                        <span className="text-muted-foreground">{a.action}</span>
-                      </div>
-                      <div className="text-xs text-muted-foreground">{a.at}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
-            <TabsContent value="comments" className="mt-4">
-              <div className="space-y-3">
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Add a comment..."
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                  />
-                  <Button
-                    onClick={() => {
-                      if (comment.trim()) {
-                        alert('Comment posted (demo)');
-                        setComment('');
-                      }
-                    }}
-                  >
-                    Post
-                  </Button>
-                </div>
-                <Separator />
-                <div className="space-y-2 text-sm">
-                  <div>
-                    <span className="font-medium">Alex Kim:</span> Please prioritize SAST results
-                    today.
-                  </div>
-                  <div>
-                    <span className="font-medium">QA Payments:</span> Test plan updated with
-                    negative cases.
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+      {/* Release Log Dialog is now accessed via dropdown in the releases page */}
     </div>
   );
 }
