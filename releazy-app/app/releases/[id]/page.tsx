@@ -8,9 +8,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, ClipboardList } from 'lucide-react';
+import { MoreHorizontal, ClipboardList, XCircle } from 'lucide-react';
 import { ReleaseLogDialog } from '@/components/release-log-dialog';
 
 export default function ReleaseDetailPage() {
@@ -33,9 +34,17 @@ export default function ReleaseDetailPage() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => console.log('Cancel release clicked')}>
-              Cancel Release
+            <DropdownMenuItem 
+              variant="destructive"
+              onClick={() => console.log('Cancel release clicked')}
+              className="hover:bg-red-100 dark:hover:bg-red-900/20"
+            >
+              <div className="flex items-center gap-2 w-full">
+                <XCircle className="h-4 w-4" />
+                <span>Cancel Release</span>
+              </div>
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <ReleaseLogDialog 
                 releaseId={Array.isArray(id) ? id[0] : id}
@@ -47,8 +56,8 @@ export default function ReleaseDetailPage() {
                   { at: 'Aug 04, 11:20', who: 'Release Eng', action: `Created release ${Array.isArray(id) ? id[0] : id}.` },
                 ]}
               >
-                <div className="flex items-center gap-2 w-full">
-                  <ClipboardList className="h-4 w-4" />
+                <div className="flex items-center gap-2 w-full hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-sm px-2 py-1.5">
+                  <ClipboardList className="h-4 w-4 text-blue-500" />
                   <span>Release Log</span>
                 </div>
               </ReleaseLogDialog>

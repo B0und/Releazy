@@ -35,7 +35,7 @@ export function AppShell({
   return (
     <div className="min-h-[100dvh] bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-900 dark:to-zinc-950">
       <div className="mx-auto flex w-full max-w-7xl gap-6 px-4 py-6 md:px-8">
-        <aside className="sticky flex-col top-4 hidden h-[calc(100dvh-3rem)] w-[250px] shrink-0 rounded-2xl border bg-background/80 p-4 shadow-sm backdrop-blur md:flex">
+        <aside className="sticky flex-col top-4 hidden h-[calc(100dvh-3rem)] w-[200px] shrink-0 rounded-2xl border bg-background/80 p-4 shadow-sm backdrop-blur md:flex">
           <div className="flex items-center gap-2 px-2">
             <div className="relative rounded-md flex gap-2">
               <GitMerge className="size-5 text-emerald-600" />

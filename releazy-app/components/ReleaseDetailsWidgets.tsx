@@ -85,9 +85,9 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
   const active = release.steps.find((s) => s.id === activeStep) ?? release.steps[0];
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      {/* Workflow Card */}
-      <Card className="lg:col-span-2">
+    <div className="grid gap-6 grid-cols-12">
+      {/* Workflow Card - minimal width */}
+      <Card className="col-span-4">
         <CardHeader>
           <CardTitle>Workflow</CardTitle>
           <CardDescription>Stages of this release</CardDescription>
@@ -97,8 +97,8 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
         </CardContent>
       </Card>
 
-      {/* Dynamic Details & Actions */}
-      <Card className="lg:col-span-2">
+      {/* Dynamic Details & Actions - takes remaining space */}
+      <Card className="col-span-8">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
