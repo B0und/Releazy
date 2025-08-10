@@ -124,27 +124,36 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {release.tickets.map((t) => (
-                      <TableRow key={t.id}>
-                        <TableCell className="font-medium">{t.id}</TableCell>
-                        <TableCell>{t.summary}</TableCell>
-                        <TableCell>
-                          <Badge variant="secondary">{t.status}</Badge>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button size="sm" variant="ghost">
-                            Remove
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {release.tickets.map((t, index) => {
+                      // Check if this is a newly added ticket (last in the array)
+                      const isNewlyAdded = index === release.tickets.length - 1 && 
+                                          suggestions.length > 0;
+                      
+                      return (
+                        <TableRow 
+                          key={t.id}
+                          className={isNewlyAdded ? "animate-in fade-in slide-in-from-bottom-2 duration-500" : ""}
+                        >
+                          <TableCell className="font-medium">{t.id}</TableCell>
+                          <TableCell>{t.summary}</TableCell>
+                          <TableCell>
+                            <Badge variant="secondary">{t.status}</Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button size="sm" variant="ghost">
+                              Remove
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </div>
 
               {/* AI Suggestions */}
               {suggestions.length > 0 && (
-                <div className="rounded-lg border bg-muted/40 p-3">
+                <div className="rounded-lg border bg-muted/40 p-3 animate-in fade-in duration-300">
                   <div className="flex items-center gap-2 mb-2">
                     <Sparkles className="h-4 w-4 text-purple-500" />
                     <div className="text-sm font-medium">AI Suggestions</div>
@@ -157,12 +166,13 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
                         summary={s.summary}
                         why={s.why}
                         onAdd={() => {
-                          // Add to tickets
+                          // Add to tickets with animation
+                          const newTicket = { id: s.id, summary: s.summary, status: 'To Do' as const };
                           setRelease((prev) => ({
                             ...prev,
                             tickets: [
                               ...prev.tickets,
-                              { id: s.id, summary: s.summary, status: 'To Do' }
+                              newTicket
                             ]
                           }));
                           

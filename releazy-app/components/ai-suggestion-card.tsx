@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Sparkles } from 'lucide-react';
 
+import { useState } from 'react';
+
 export function AISuggestionCard({
   id = 'TCK-0000',
   summary = 'Suggested ticket summary',
@@ -15,8 +17,22 @@ export function AISuggestionCard({
   why?: string;
   onAdd?: () => void;
 }) {
+  const [isRemoving, setIsRemoving] = useState(false);
+  
+  const handleAdd = () => {
+    setIsRemoving(true);
+    // Wait for animation to complete before calling onAdd
+    setTimeout(() => {
+      onAdd();
+    }, 300);
+  };
+  
   return (
-    <Card className="border-dashed">
+    <Card 
+      className={`border-dashed animate-in fade-in slide-in-from-bottom-4 duration-300 ${
+        isRemoving ? 'animate-out fade-out slide-out-to-right-4 duration-300' : ''
+      }`}
+    >
       <CardContent className="p-3">
         <div className="text-sm font-medium">
           {id} — {summary}
@@ -28,7 +44,12 @@ export function AISuggestionCard({
           {why}
         </div>
         <div className="mt-2">
-          <Button size="sm" onClick={onAdd}>
+          <Button 
+            size="sm" 
+            onClick={handleAdd}
+            className="hover:scale-105 transition-transform"
+            disabled={isRemoving}
+          >
             + Add
           </Button>
         </div>
