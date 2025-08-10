@@ -72,8 +72,11 @@ const activity = [
   { at: "Aug 04, 11:20", who: "Release Eng", action: "Created release REL-2381." },
 ]
 
-export default function ReleaseDetails({ params }: { params: { id: string } }) {
-  const release = useMemo(() => (params.id === MOCK_RELEASE.id ? MOCK_RELEASE : undefined), [params.id])
+export default function ReleaseDetailsWidgets({ params }: { params: { id: string } }) {
+  const release = useMemo(() => {
+    const releaseId = Array.isArray(params.id) ? params.id[0] : params.id
+    return releaseId === MOCK_RELEASE.id ? MOCK_RELEASE : MOCK_RELEASE
+  }, [params.id])
   const [activeStep, setActiveStep] = useState<string>(
     release?.steps.find((s) => s.status === "in-progress")?.id ?? "ticket",
   )
@@ -93,262 +96,257 @@ export default function ReleaseDetails({ params }: { params: { id: string } }) {
   }[release.risk]
 
   return (
-    <>
-      {/* Top meta info row */}
-    
-        {/* Pane 1: Static context */}
-        {/* <Card>
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div>
-                <CardTitle className="leading-tight">{release.name}</CardTitle>
-                <CardDescription>{release.id}</CardDescription>
-              </div>
-              <span
-                className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${
-                  release.status === "Completed"
-                    ? "bg-emerald-500/15 text-emerald-700 border-emerald-500/20"
-                    : release.status === "In Progress"
-                      ? "bg-sky-500/15 text-sky-700 border-sky-500/20"
-                      : release.status === "Failed"
-                        ? "bg-rose-500/15 text-rose-700 border-rose-500/20"
-                        : "bg-indigo-500/15 text-indigo-700 border-indigo-500/20"
-                }`}
-              >
-                {release.status}
-              </span>
+    <div className="grid gap-6 lg:grid-cols-2">
+      {/* Release Context Card */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div>
+              <CardTitle className="leading-tight">{release.name}</CardTitle>
+              <CardDescription>{release.id}</CardDescription>
             </div>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div>
-                <div className="text-muted-foreground">Product</div>
-                <div className="font-medium">{release.product}</div>
-              </div>
-              <div>
-                <div className="text-muted-foreground">Owner</div>
-                <div className="font-medium">{release.owner}</div>
-              </div>
-              <div>
-                <div className="text-muted-foreground">Start</div>
-                <div className="font-medium">{release.start}</div>
-              </div>
-              <div>
-                <div className="text-muted-foreground">Target</div>
-                <div className="font-medium">{release.target}</div>
-              </div>
+            <span
+              className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${
+                release.status === "Completed"
+                  ? "bg-emerald-500/15 text-emerald-700 border-emerald-500/20"
+                  : release.status === "In Progress"
+                    ? "bg-sky-500/15 text-sky-700 border-sky-500/20"
+                    : release.status === "Failed"
+                      ? "bg-rose-500/15 text-rose-700 border-rose-500/20"
+                      : "bg-indigo-500/15 text-indigo-700 border-indigo-500/20"
+              }`}
+            >
+              {release.status}
+            </span>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="grid grid-cols-2 gap-2 text-sm">
+            <div>
+              <div className="text-muted-foreground">Product</div>
+              <div className="font-medium">{release.product}</div>
             </div>
+            <div>
+              <div className="text-muted-foreground">Owner</div>
+              <div className="font-medium">{release.owner}</div>
+            </div>
+            <div>
+              <div className="text-muted-foreground">Start</div>
+              <div className="font-medium">{release.start}</div>
+            </div>
+            <div>
+              <div className="text-muted-foreground">Target</div>
+              <div className="font-medium">{release.target}</div>
+            </div>
+          </div>
 
-            <div className="flex items-center gap-2">
-              <Badge className={`border ${riskBadge}`}>{release.risk}</Badge>
-              <div className="text-xs text-muted-foreground">AI-generated</div>
+          <div className="flex items-center gap-2">
+            <Badge className={`border ${riskBadge}`}>{release.risk}</Badge>
+            <div className="text-xs text-muted-foreground">AI-generated</div>
+          </div>
+
+          <div className="space-y-1.5">
+            <div className="text-sm font-medium">Overall Progress</div>
+            <Progress value={pct} />
+            <div className="text-xs text-muted-foreground">
+              {pct}% ({completed}/{release.steps.length} steps)
             </div>
+          </div>
 
-            <div className="space-y-1.5">
-              <div className="text-sm font-medium">Overall Progress</div>
-              <Progress value={pct} />
-              <div className="text-xs text-muted-foreground">
-                {pct}% ({completed}/{release.steps.length} steps)
-              </div>
+          <div className="space-y-1">
+            <div className="text-sm font-medium">Time in Stage</div>
+            <div className="text-xs text-muted-foreground">Testing — 2d 11h</div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Workflow Card */}
+      <Card className="lg:col-span-2">
+        <CardHeader>
+          <CardTitle>Workflow</CardTitle>
+          <CardDescription>Stages of this release</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ReleaseStepper steps={release.steps} activeId={activeStep} onSelect={setActiveStep} />
+        </CardContent>
+      </Card>
+
+      {/* Dynamic Details & Actions */}
+      <Card className="lg:col-span-2">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>{active.name}</CardTitle>
+              <CardDescription>Owner: {active.owner}</CardDescription>
             </div>
-
-            <div className="space-y-1">
-              <div className="text-sm font-medium">Time in Stage</div>
-              <div className="text-xs text-muted-foreground">Testing — 2d 11h</div>
-            </div>
-          </CardContent>
-        </Card> */}
-
-        {/* Pane 2: Visual workflow */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Workflow</CardTitle>
-            <CardDescription>Stages of this release</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ReleaseStepper steps={release.steps} activeId={activeStep} onSelect={setActiveStep} />
-          </CardContent>
-        </Card>
-
-        {/* Pane 3: Dynamic Details & Actions */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {active.id === "ticket" ? (
+            <>
+              {/* Included Tickets */}
               <div>
-                <CardTitle>{active.name}</CardTitle>
-                <CardDescription>Owner: {active.owner}</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {active.id === "ticket" ? (
-              <>
-                {/* Included Tickets */}
-                <div>
-                  <div className="font-medium mb-2">Included Tickets</div>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>ID</TableHead>
-                        <TableHead>Summary</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Remove</TableHead>
+                <div className="font-medium mb-2">Included Tickets</div>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>ID</TableHead>
+                      <TableHead>Summary</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Remove</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {release.tickets.map((t) => (
+                      <TableRow key={t.id}>
+                        <TableCell className="font-medium">{t.id}</TableCell>
+                        <TableCell>{t.summary}</TableCell>
+                        <TableCell>
+                          <Badge variant="secondary">{t.status}</Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button size="sm" variant="ghost">
+                            Remove
+                          </Button>
+                        </TableCell>
                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {release.tickets.map((t) => (
-                        <TableRow key={t.id}>
-                          <TableCell className="font-medium">{t.id}</TableCell>
-                          <TableCell>{t.summary}</TableCell>
-                          <TableCell>
-                            <Badge variant="secondary">{t.status}</Badge>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Button size="sm" variant="ghost">
-                              Remove
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-
-                {/* AI Suggestions */}
-                <div className="rounded-lg border bg-muted/40 p-3">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="h-4 w-4 text-purple-500" />
-                    <div className="text-sm font-medium">AI Suggestions</div>
-                  </div>
-                  <div className="grid sm:grid-cols-2 gap-3">
-                    {suggestionData.map((s) => (
-                      <AISuggestionCard key={s.id} id={s.id} summary={s.summary} why={s.why} onAdd={() => {}} />
                     ))}
-                  </div>
-                </div>
-
-                {/* Manual Search */}
-                <Collapsible>
-                  <div className="flex items-center">
-                    <CollapsibleTrigger asChild>
-                      <Button variant="ghost" size="sm" className="px-0">
-                        Manual Search
-                        <ChevronDown className="h-4 w-4 ml-1 transition-transform data-[state=open]:rotate-180" />
-                      </Button>
-                    </CollapsibleTrigger>
-                  </div>
-                  <CollapsibleContent className="mt-2 space-y-3">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                      <Input placeholder="Search by keyword or JQL" className="md:col-span-2" />
-                      <Input placeholder="Assignee" />
-                      <Input placeholder="Status (e.g., In Progress)" />
-                      <Input placeholder="JQL (advanced)" className="md:col-span-3" />
-                    </div>
-                    <div className="rounded-md border">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>ID</TableHead>
-                            <TableHead>Summary</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Add</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {[
-                            { id: "PAY-9901", summary: "Retry logic for 3DS challenge", status: "To Do" },
-                            { id: "PAY-9903", summary: "Alert on chargeback anomalies", status: "In Progress" },
-                          ].map((r) => (
-                            <TableRow key={r.id}>
-                              <TableCell className="font-medium">{r.id}</TableCell>
-                              <TableCell>{r.summary}</TableCell>
-                              <TableCell>
-                                <Badge variant="secondary">{r.status}</Badge>
-                              </TableCell>
-                              <TableCell className="text-right">
-                                <Button size="sm">Add</Button>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-              </>
-            ) : (
-              <div className="text-sm text-muted-foreground">
-                Select "Jira Ticket Selection" to manage tickets for this release. Other steps will show their
-                respective details here.
+                  </TableBody>
+                </Table>
               </div>
-            )}
-          </CardContent>
-        </Card>
-    
 
-      {/* Below panes: Activity & Comments */}
-      {/* <div className="mt-6">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle>History & Collaboration</CardTitle>
-            <CardDescription>Immutable activity log and comments</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="activity">
-              <TabsList>
-                <TabsTrigger value="activity">Activity Log</TabsTrigger>
-                <TabsTrigger value="comments">Comments</TabsTrigger>
-              </TabsList>
-              <TabsContent value="activity" className="mt-4">
-                <div className="space-y-3">
-                  {activity.map((a, i) => (
-                    <div key={i} className="flex items-start gap-3">
-                      <div className="h-2.5 w-2.5 rounded-full bg-foreground/70 mt-1.5" />
-                      <div>
-                        <div className="text-sm">
-                          <span className="font-medium">{a.who}</span>{" "}
-                          <span className="text-muted-foreground">{a.action}</span>
-                        </div>
-                        <div className="text-xs text-muted-foreground">{a.at}</div>
-                      </div>
-                    </div>
+              {/* AI Suggestions */}
+              <div className="rounded-lg border bg-muted/40 p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="h-4 w-4 text-purple-500" />
+                  <div className="text-sm font-medium">AI Suggestions</div>
+                </div>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  {suggestionData.map((s) => (
+                    <AISuggestionCard key={s.id} id={s.id} summary={s.summary} why={s.why} onAdd={() => {}} />
                   ))}
                 </div>
-              </TabsContent>
-              <TabsContent value="comments" className="mt-4">
-                <div className="space-y-3">
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Add a comment..."
-                      value={comment}
-                      onChange={(e) => setComment(e.target.value)}
-                    />
-                    <Button
-                      onClick={() => {
-                        if (comment.trim()) {
-                          alert("Comment posted (demo)")
-                          setComment("")
-                        }
-                      }}
-                    >
-                      Post
+              </div>
+
+              {/* Manual Search */}
+              <Collapsible>
+                <div className="flex items-center">
+                  <CollapsibleTrigger asChild>
+                    <Button variant="ghost" size="sm" className="px-0">
+                      Manual Search
+                      <ChevronDown className="h-4 w-4 ml-1 transition-transform data-[state=open]:rotate-180" />
                     </Button>
+                  </CollapsibleTrigger>
+                </div>
+                <CollapsibleContent className="mt-2 space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <Input placeholder="Search by keyword or JQL" className="md:col-span-2" />
+                    <Input placeholder="Assignee" />
+                    <Input placeholder="Status (e.g., In Progress)" />
+                    <Input placeholder="JQL (advanced)" className="md:col-span-3" />
                   </div>
-                  <Separator />
-                  <div className="space-y-2 text-sm">
+                  <div className="rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>ID</TableHead>
+                          <TableHead>Summary</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead className="text-right">Add</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {[
+                          { id: "PAY-9901", summary: "Retry logic for 3DS challenge", status: "To Do" },
+                          { id: "PAY-9903", summary: "Alert on chargeback anomalies", status: "In Progress" },
+                        ].map((r) => (
+                          <TableRow key={r.id}>
+                            <TableCell className="font-medium">{r.id}</TableCell>
+                            <TableCell>{r.summary}</TableCell>
+                            <TableCell>
+                              <Badge variant="secondary">{r.status}</Badge>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Button size="sm">Add</Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            </>
+          ) : (
+            <div className="text-sm text-muted-foreground">
+              Select "Jira Ticket Selection" to manage tickets for this release. Other steps will show their
+              respective details here.
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Activity & Comments */}
+      <Card className="lg:col-span-2">
+        <CardHeader className="pb-2">
+          <CardTitle>History & Collaboration</CardTitle>
+          <CardDescription>Immutable activity log and comments</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="activity">
+            <TabsList>
+              <TabsTrigger value="activity">Activity Log</TabsTrigger>
+              <TabsTrigger value="comments">Comments</TabsTrigger>
+            </TabsList>
+            <TabsContent value="activity" className="mt-4">
+              <div className="space-y-3">
+                {activity.map((a, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <div className="h-2.5 w-2.5 rounded-full bg-foreground/70 mt-1.5" />
                     <div>
-                      <span className="font-medium">Alex Kim:</span> Please prioritize SAST results today.
+                      <div className="text-sm">
+                        <span className="font-medium">{a.who}</span>{" "}
+                        <span className="text-muted-foreground">{a.action}</span>
+                      </div>
+                      <div className="text-xs text-muted-foreground">{a.at}</div>
                     </div>
-                    <div>
-                      <span className="font-medium">QA Payments:</span> Test plan updated with negative cases.
-                    </div>
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+            <TabsContent value="comments" className="mt-4">
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Add a comment..."
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                  />
+                  <Button
+                    onClick={() => {
+                      if (comment.trim()) {
+                        alert("Comment posted (demo)")
+                        setComment("")
+                      }
+                    }}
+                  >
+                    Post
+                  </Button>
+                </div>
+                <Separator />
+                <div className="space-y-2 text-sm">
+                  <div>
+                    <span className="font-medium">Alex Kim:</span> Please prioritize SAST results today.
+                  </div>
+                  <div>
+                    <span className="font-medium">QA Payments:</span> Test plan updated with negative cases.
                   </div>
                 </div>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
-      </div> */}
-    </>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+    </div>
   )
 }
