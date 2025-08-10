@@ -27,6 +27,7 @@ import {
 } from "lucide-react"
 import { useParams } from "next/navigation"
 import { useMemo, useState } from "react"
+import { ReleaseStepper } from "@/components/release-stepper"
 
 type Ticket = {
   id: string
@@ -124,7 +125,7 @@ export default function ReleaseDetailPage() {
               <Pill icon={<Rocket className="h-3.5 w-3.5" />} label="Progress" value={`${stats.progressPct}%`} />
               <Pill icon={<GitBranchPlus className="h-3.5 w-3.5" />} label="Branch" value={stats.branch} />
             </div>
-            <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center md:justify-end">
+            {/* <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center md:justify-end">
               <div className="flex gap-2">
                 <Button variant="secondary">Sync from Jira</Button>
                 <Button className="gap-2">
@@ -132,140 +133,14 @@ export default function ReleaseDetailPage() {
                   Run E2E
                 </Button>
               </div>
-            </div>
+            </div> */}
           </div>
         </Card>
 
         {/* Main grid: Pipeline | Jira selection workbench (single list) */}
         <div className="grid flex-1 min-h-0 gap-4 lg:grid-cols-[280px_1fr]">
-          {/* Pipeline column */}
-          <Card className="flex min-h-0 flex-col overflow-hidden">
-            <CardHeader>
-              <CardTitle className="text-base">Pipeline</CardTitle>
-            </CardHeader>
-            <CardContent className="min-h-0 flex-1 p-0">
-              <ScrollArea className="h-full px-4 pb-4">
-                <div className="grid gap-3 pt-1">
-                  {STEPS.map((s, i) => (
-                    <PipelineStep
-                      key={s.id}
-                      label={s.label}
-                      icon={s.icon}
-                      active={i === activeIndex}
-                      done={i < activeIndex}
-                      onClick={() => setActiveStep(s.id)}
-                    />
-                  ))}
-                </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
-
-          {/* Jira selection block with search input moved here; single "Included" list */}
-          <Card className="flex min-h-0 flex-col overflow-hidden">
-            <div className="sticky top-0 z-10 border-b bg-background/95 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">Jira tickets selection</span>
-                  <Badge variant="secondary" className="rounded-full">
-                    {included.length} included
-                  </Badge>
-                </div>
-                <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-                  <Tabs defaultValue={statusFilter} onValueChange={(v) => setStatusFilter(v as any)} className="h-9">
-                    <TabsList className="bg-muted/40">
-                      <TabsTrigger value="all">All</TabsTrigger>
-                      <TabsTrigger value="todo">Todo</TabsTrigger>
-                      <TabsTrigger value="doing">Doing</TabsTrigger>
-                      <TabsTrigger value="done">Done</TabsTrigger>
-                    </TabsList>
-                  </Tabs>
-                  <div className="relative sm:w-[280px]">
-                    <Search className="pointer-events-none absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      aria-label="Search included tickets"
-                      placeholder="Search included tickets..."
-                      className="pl-8"
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid min-h-0 flex-1 gap-4 p-4">
-              <Card className="flex min-h-0 flex-col">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm">Included in this release</CardTitle>
-                </CardHeader>
-                <CardContent className="min-h-0 flex-1 p-0">
-                  <div className="flex items-center justify-between gap-2 px-4 pb-2">
-                    <div className="flex items-center gap-2">
-                      <Checkbox
-                        id="select-all-included"
-                        checked={
-                          includedFiltered.length > 0 &&
-                          includedFiltered.every((t) => selectedIncluded[t.id]) &&
-                          Object.keys(selectedIncluded).length > 0
-                        }
-                        onCheckedChange={(val) => {
-                          const next: Record<string, boolean> = {}
-                          if (val) includedFiltered.forEach((t) => (next[t.id] = true))
-                          setSelectedIncluded(next)
-                        }}
-                      />
-                      <Label htmlFor="select-all-included" className="text-sm text-muted-foreground">
-                        Select all
-                      </Label>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => {
-                          const toRemoveIds = Object.entries(selectedIncluded)
-                            .filter(([, v]) => v)
-                            .map(([k]) => k)
-                          if (toRemoveIds.length) {
-                            setIncluded((prev) => prev.filter((t) => !toRemoveIds.includes(t.id)))
-                            setSelectedIncluded({})
-                          }
-                        }}
-                      >
-                        Remove selected
-                      </Button>
-                    </div>
-                  </div>
-                  <ScrollArea className="h-full px-4 pb-4">
-                    <div className="grid gap-2 pt-1">
-                      {includedFiltered.map((t) => (
-                        <TicketRow
-                          key={t.id}
-                          ticket={t}
-                          checkbox={{
-                            checked: !!selectedIncluded[t.id],
-                            onChange: (v) => setSelectedIncluded((prev) => ({ ...prev, [t.id]: !!v })),
-                            label: `Select ${t.id}`,
-                          }}
-                          action={
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => setIncluded((prev) => prev.filter((i) => i.id !== t.id))}
-                            >
-                              Remove
-                            </Button>
-                          }
-                        />
-                      ))}
-                      {includedFiltered.length === 0 && <EmptyList message="No tickets match your filters." />}
-                    </div>
-                  </ScrollArea>
-                </CardContent>
-              </Card>
-            </div>
-          </Card>
+        <ReleaseStepper steps={[{id: "1", name: }]} />
+        <div />
         </div>
       </div>
     </AppShell>

@@ -35,13 +35,13 @@ export function AppShell({
   return (
     <div className="min-h-[100dvh] bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-900 dark:to-zinc-950">
       <div className="mx-auto flex w-full max-w-7xl gap-6 px-4 py-6 md:px-8">
-        <aside className="sticky top-4 hidden h-[calc(100dvh-3rem)] w-[250px] shrink-0 rounded-2xl border bg-background/80 p-4 shadow-sm backdrop-blur md:block">
+        <aside className="sticky flex-col top-4 hidden h-[calc(100dvh-3rem)] w-[250px] shrink-0 rounded-2xl border bg-background/80 p-4 shadow-sm backdrop-blur md:flex">
           <div className="flex items-center gap-2 px-2">
             <div className="relative rounded-md flex gap-2">
-              
-                <p className="font-semibold tracking-tight">Releazy</p>
-                <GitMerge className="size-5 text-emerald-600" />
-            
+
+              <GitMerge className="size-5 text-emerald-600" />
+              <p className="font-semibold tracking-tight">Releazy</p>
+
             </div>
           </div>
           <Separator className="my-4" />

@@ -99,63 +99,55 @@ export default function ReleasesPage() {
               <StatPill label="Done" value={counts.done} />
               <StatPill label="Planned" value={counts.planned} />
             </div>
-            <div className="flex w-full items-center gap-2 sm:w-auto">
-              <div className="relative w-full sm:w-[280px]">
-                <Search className="pointer-events-none absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  aria-label="Search releases"
-                  placeholder="Search releases..."
-                  className="pl-8"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                />
-              </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="gap-2 bg-transparent">
-                    <ListFilter className="h-4 w-4" />
-                    {status}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuLabel>Filter by status</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  {STATUS.map((s) => (
-                    <DropdownMenuItem key={s} onClick={() => setStatus(s)}>
-                      {s}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="secondary" className="gap-2">
-                    <Download className="h-4 w-4" />
-                    Export
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>Export as</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => fakeExport("csv")}>CSV</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => fakeExport("xlsx")}>Excel (.xlsx)</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => fakeExport("json")}>JSON</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+
           </div>
         </Card>
 
         {/* Main content: full-height table area */}
-        <Card className="flex h-full min-h-0 flex-col overflow-hidden">
-          <div className="flex items-center justify-between gap-2 border-b p-3 sm:p-4">
-            <div className="text-sm text-muted-foreground">
-              Showing {filtered.length} of {releases.length} releases
+        <Card className="flex h-full min-h-0 flex-col overflow-hidden px-4">
+          <div className="flex w-full items-center gap-2 sm:w-auto">
+            <div className="relative w-full sm:w-[280px]">
+              <Search className="pointer-events-none absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                aria-label="Search releases"
+                placeholder="Search releases..."
+                className="pl-8"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
             </div>
-            <Button variant="outline" className="gap-2 bg-transparent">
-              <Filter className="h-4 w-4" />
-              Advanced filters
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="gap-2 bg-transparent">
+                  <ListFilter className="h-4 w-4" />
+                  {status}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuLabel>Filter by status</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {STATUS.map((s) => (
+                  <DropdownMenuItem key={s} onClick={() => setStatus(s)}>
+                    {s}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="secondary" className="gap-2">
+                  <Download className="h-4 w-4" />
+                  Export
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Export as</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => fakeExport("csv")}>CSV</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => fakeExport("xlsx")}>Excel (.xlsx)</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => fakeExport("json")}>JSON</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           <div className="flex-1 overflow-auto">
