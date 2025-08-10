@@ -89,77 +89,15 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
 
   const active = release.steps.find((s) => s.id === activeStep) ?? release.steps[0]
 
-  const riskBadge = {
-    "Low Risk": "bg-emerald-500/15 text-emerald-700 border-emerald-500/20",
-    "Medium Risk": "bg-amber-500/15 text-amber-700 border-amber-500/20",
-    "High Risk": "bg-rose-500/15 text-rose-700 border-rose-500/20",
-  }[release.risk]
+
+
+
+
+
+
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
-      {/* Release Context Card */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-start justify-between">
-            <div>
-              <CardTitle className="leading-tight">{release.name}</CardTitle>
-              <CardDescription>{release.id}</CardDescription>
-            </div>
-            <span
-              className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${
-                release.status === "Completed"
-                  ? "bg-emerald-500/15 text-emerald-700 border-emerald-500/20"
-                  : release.status === "In Progress"
-                    ? "bg-sky-500/15 text-sky-700 border-sky-500/20"
-                    : release.status === "Failed"
-                      ? "bg-rose-500/15 text-rose-700 border-rose-500/20"
-                      : "bg-indigo-500/15 text-indigo-700 border-indigo-500/20"
-              }`}
-            >
-              {release.status}
-            </span>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            <div>
-              <div className="text-muted-foreground">Product</div>
-              <div className="font-medium">{release.product}</div>
-            </div>
-            <div>
-              <div className="text-muted-foreground">Owner</div>
-              <div className="font-medium">{release.owner}</div>
-            </div>
-            <div>
-              <div className="text-muted-foreground">Start</div>
-              <div className="font-medium">{release.start}</div>
-            </div>
-            <div>
-              <div className="text-muted-foreground">Target</div>
-              <div className="font-medium">{release.target}</div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Badge className={`border ${riskBadge}`}>{release.risk}</Badge>
-            <div className="text-xs text-muted-foreground">AI-generated</div>
-          </div>
-
-          <div className="space-y-1.5">
-            <div className="text-sm font-medium">Overall Progress</div>
-            <Progress value={pct} />
-            <div className="text-xs text-muted-foreground">
-              {pct}% ({completed}/{release.steps.length} steps)
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <div className="text-sm font-medium">Time in Stage</div>
-            <div className="text-xs text-muted-foreground">Testing — 2d 11h</div>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Workflow Card */}
       <Card className="lg:col-span-2">
         <CardHeader>
@@ -223,7 +161,7 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
                 </div>
                 <div className="grid sm:grid-cols-2 gap-3">
                   {suggestionData.map((s) => (
-                    <AISuggestionCard key={s.id} id={s.id} summary={s.summary} why={s.why} onAdd={() => {}} />
+                    <AISuggestionCard key={s.id} id={s.id} summary={s.summary} why={s.why} onAdd={() => { }} />
                   ))}
                 </div>
               </div>

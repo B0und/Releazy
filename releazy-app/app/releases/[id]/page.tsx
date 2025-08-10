@@ -1,10 +1,7 @@
 "use client"
 
 import { AppShell } from "@/components/app-shell"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useParams } from "next/navigation"
-import { useMemo } from "react"
 import ReleaseDetailsWidgets from "@/components/ReleaseDetailsWidgets"
 
 export default function ReleaseDetailPage() {
