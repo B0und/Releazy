@@ -1,5 +1,7 @@
 'use client';
 
+import { CalendarDays, Plus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,8 +16,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { CalendarDays, Plus } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 
 type CreateReleaseDialogProps = {
   defaultName?: string;
@@ -26,6 +26,7 @@ export function CreateReleaseDialog({
 }: CreateReleaseDialogProps) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState(defaultName);
+  const [jql, setJql] = useState('fixVersion = 1.2.3 ORDER BY priority DESC');
   const [date, setDate] = useState('');
   const [desc, setDesc] = useState('');
   const router = useRouter();
@@ -61,6 +62,15 @@ export function CreateReleaseDialog({
               <Input id="date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
               <CalendarDays className="h-4 w-4 text-muted-foreground" />
             </div>
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="rel-jql">JQL (optional)</Label>
+            <Input
+              id="rel-jql"
+              value={jql}
+              onChange={(e) => setJql(e.target.value)}
+              placeholder="e.g., fixVersion = 2.5.0"
+            />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="desc">{'Description'}</Label>
