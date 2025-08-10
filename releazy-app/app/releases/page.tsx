@@ -1,13 +1,20 @@
-"use client"
+'use client';
 
-import type React from "react"
+import type React from 'react';
 
-import { AppShell } from "@/components/app-shell"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { AppShell } from '@/components/app-shell';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,77 +22,89 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
-import { CreateReleaseDialog } from "@/components/create-release-dialog"
-import { useMemo, useState } from "react"
-import { useRouter } from "next/navigation"
-import { Download, Filter, ListFilter, Search } from "lucide-react"
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
+import { CreateReleaseDialog } from '@/components/create-release-dialog';
+import { useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Download, Filter, ListFilter, Search } from 'lucide-react';
 
 type Release = {
-  id: string
-  name: string
-  status: "Planned" | "In progress" | "Done" | "Canceled"
-  progress: number
-  start: string
-  end?: string
-}
+  id: string;
+  name: string;
+  status: 'Planned' | 'In progress' | 'Done' | 'Canceled';
+  progress: number;
+  start: string;
+  end?: string;
+};
 
 const releasesSeed: Release[] = [
   {
-    id: "mv-release-v120-4-0",
-    name: "MV release v120.4.0",
-    status: "In progress",
+    id: 'mv-release-v120-4-0',
+    name: 'MV release v120.4.0',
+    status: 'In progress',
     progress: 68,
-    start: "2025-08-01",
+    start: '2025-08-01',
   },
   {
-    id: "mv-release-v120-3-0",
-    name: "MV release v120.3.0",
-    status: "Done",
+    id: 'mv-release-v120-3-0',
+    name: 'MV release v120.3.0',
+    status: 'Done',
     progress: 100,
-    start: "2025-07-15",
-    end: "2025-07-29",
+    start: '2025-07-15',
+    end: '2025-07-29',
   },
   {
-    id: "hotfix-ssrm-948",
-    name: "Hotfix SSRM-948",
-    status: "Done",
+    id: 'hotfix-ssrm-948',
+    name: 'Hotfix SSRM-948',
+    status: 'Done',
     progress: 100,
-    start: "2025-07-20",
-    end: "2025-07-20",
+    start: '2025-07-20',
+    end: '2025-07-20',
   },
-]
+];
 
-const STATUS: Array<Release["status"] | "All"> = ["All", "Planned", "In progress", "Done", "Canceled"]
+const STATUS: Array<Release['status'] | 'All'> = [
+  'All',
+  'Planned',
+  'In progress',
+  'Done',
+  'Canceled',
+];
 
 export default function ReleasesPage() {
-  const router = useRouter()
-  const [status, setStatus] = useState<(typeof STATUS)[number]>("All")
-  const [query, setQuery] = useState("")
-  const [releases] = useState<Release[]>(releasesSeed)
+  const router = useRouter();
+  const [status, setStatus] = useState<(typeof STATUS)[number]>('All');
+  const [query, setQuery] = useState('');
+  const [releases] = useState<Release[]>(releasesSeed);
 
   const filtered = useMemo(() => {
     return releases.filter((r) => {
-      const matchesStatus = status === "All" ? true : r.status === status
-      const q = query.trim().toLowerCase()
-      const matchesQuery = q.length ? r.name.toLowerCase().includes(q) || r.id.toLowerCase().includes(q) : true
-      return matchesStatus && matchesQuery
-    })
-  }, [releases, status, query])
+      const matchesStatus = status === 'All' ? true : r.status === status;
+      const q = query.trim().toLowerCase();
+      const matchesQuery = q.length
+        ? r.name.toLowerCase().includes(q) || r.id.toLowerCase().includes(q)
+        : true;
+      return matchesStatus && matchesQuery;
+    });
+  }, [releases, status, query]);
 
   const counts = useMemo(() => {
     return {
       total: releases.length,
-      planned: releases.filter((r) => r.status === "Planned").length,
-      inProgress: releases.filter((r) => r.status === "In progress").length,
-      done: releases.filter((r) => r.status === "Done").length,
-    }
-  }, [releases])
+      planned: releases.filter((r) => r.status === 'Planned').length,
+      inProgress: releases.filter((r) => r.status === 'In progress').length,
+      done: releases.filter((r) => r.status === 'Done').length,
+    };
+  }, [releases]);
 
   return (
-    <AppShell title="Releases" subtitle="Plan, track, and automate release pipelines" action={<CreateReleaseDialog />}>
+    <AppShell
+      title="Releases"
+      subtitle="Plan, track, and automate release pipelines"
+      action={<CreateReleaseDialog />}
+    >
       <div className="flex min-h-[60vh] flex-col gap-4 lg:min-h-[calc(100dvh-220px)]">
         {/* Top Section: stats + controls */}
         <Card className="border-none bg-gradient-to-tr from-violet-50 to-fuchsia-50 p-0 shadow-sm dark:from-violet-950/30 dark:to-fuchsia-950/20">
@@ -99,7 +118,6 @@ export default function ReleasesPage() {
               <StatPill label="Done" value={counts.done} />
               <StatPill label="Planned" value={counts.planned} />
             </div>
-
           </div>
         </Card>
 
@@ -143,9 +161,11 @@ export default function ReleasesPage() {
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Export as</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => fakeExport("csv")}>CSV</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => fakeExport("xlsx")}>Excel (.xlsx)</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => fakeExport("json")}>JSON</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => fakeExport('csv')}>CSV</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => fakeExport('xlsx')}>
+                  Excel (.xlsx)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => fakeExport('json')}>JSON</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -169,7 +189,11 @@ export default function ReleasesPage() {
                     <TableCell>
                       <Badge
                         variant={
-                          r.status === "Done" ? "default" : r.status === "Canceled" ? "destructive" : "secondary"
+                          r.status === 'Done'
+                            ? 'default'
+                            : r.status === 'Canceled'
+                              ? 'destructive'
+                              : 'secondary'
                         }
                         className="rounded-full"
                         aria-label={`Status: ${r.status}`}
@@ -180,7 +204,9 @@ export default function ReleasesPage() {
                     <TableCell className="min-w-[220px]">
                       <div className="flex items-center gap-2">
                         <Progress value={r.progress} className="h-2" aria-label="Progress" />
-                        <span className="w-12 text-right text-xs text-muted-foreground">{r.progress}%</span>
+                        <span className="w-12 text-right text-xs text-muted-foreground">
+                          {r.progress}%
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
@@ -194,7 +220,7 @@ export default function ReleasesPage() {
         </Card>
       </div>
     </AppShell>
-  )
+  );
 }
 
 function StatPill({ label, value }: { label: string; value: number }) {
@@ -203,7 +229,7 @@ function StatPill({ label, value }: { label: string; value: number }) {
       <span className="text-muted-foreground">{label}</span>
       <Badge className="rounded-full">{value}</Badge>
     </span>
-  )
+  );
 }
 
 function HoverableRow({ children, onClick }: { children: React.ReactNode; onClick?: () => void }) {
@@ -215,22 +241,22 @@ function HoverableRow({ children, onClick }: { children: React.ReactNode; onClic
       role="button"
       aria-label="Open release details"
       onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault()
-          onClick?.()
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick?.();
         }
       }}
     >
       {children}
     </TableRow>
-  )
+  );
 }
 
 /**
  * Demo export handler placeholder.
  */
-function fakeExport(fmt: "csv" | "xlsx" | "json") {
-  const friendly = fmt === "xlsx" ? "Excel" : fmt.toUpperCase()
+function fakeExport(fmt: 'csv' | 'xlsx' | 'json') {
+  const friendly = fmt === 'xlsx' ? 'Excel' : fmt.toUpperCase();
   // eslint-disable-next-line no-alert
-  alert(`Exported as ${friendly}`)
+  alert(`Exported as ${friendly}`);
 }

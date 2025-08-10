@@ -1,100 +1,100 @@
-"use client"
+'use client';
 
-import { useMemo, useState } from "react"
-import { notFound } from "next/navigation"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { Separator } from "@/components/ui/separator"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { ChevronDown, Sparkles } from "lucide-react"
-import { AISuggestionCard } from "@/components/ai-suggestion-card"
-import { ReleaseStepper, type ReleaseStep } from "@/components/release-stepper"
+import { useMemo, useState } from 'react';
+import { notFound } from 'next/navigation';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ChevronDown, Sparkles } from 'lucide-react';
+import { AISuggestionCard } from '@/components/ai-suggestion-card';
+import { ReleaseStepper, type ReleaseStep } from '@/components/release-stepper';
 
 type Release = {
-  id: string
-  name: string
-  product: string
-  owner: string
-  status: "Pending" | "In Progress" | "Completed" | "Failed"
-  start: string
-  target: string
-  risk: "Low Risk" | "Medium Risk" | "High Risk"
-  steps: ReleaseStep[]
-  tickets: { id: string; summary: string; status: "To Do" | "In Progress" | "Done" }[]
-}
+  id: string;
+  name: string;
+  product: string;
+  owner: string;
+  status: 'Pending' | 'In Progress' | 'Completed' | 'Failed';
+  start: string;
+  target: string;
+  risk: 'Low Risk' | 'Medium Risk' | 'High Risk';
+  steps: ReleaseStep[];
+  tickets: { id: string; summary: string; status: 'To Do' | 'In Progress' | 'Done' }[];
+};
 
 const MOCK_RELEASE: Release = {
-  id: "REL-2381",
-  name: "Payments v3.2",
-  product: "Payments",
-  owner: "Alex Kim",
-  status: "In Progress",
-  start: "Jul 12, 2025",
-  target: "Aug 10, 2025",
-  risk: "Medium Risk",
+  id: 'REL-2381',
+  name: 'Payments v3.2',
+  product: 'Payments',
+  owner: 'Alex Kim',
+  status: 'In Progress',
+  start: 'Jul 12, 2025',
+  target: 'Aug 10, 2025',
+  risk: 'Medium Risk',
   steps: [
-    { id: "ticket", name: "Jira Ticket Selection", owner: "Alex Kim", status: "done" },
-    { id: "dev", name: "Development", owner: "Team Payments", status: "done" },
-    { id: "test", name: "Testing", owner: "QA Payments", status: "in-progress" },
-    { id: "sec", name: "Security Review", owner: "SecOps", status: "blocked" },
-    { id: "stage", name: "Staging", owner: "DevOps", status: "todo" },
-    { id: "deploy", name: "Deploy", owner: "Release Eng", status: "todo" },
+    { id: 'ticket', name: 'Jira Ticket Selection', owner: 'Alex Kim', status: 'done' },
+    { id: 'dev', name: 'Development', owner: 'Team Payments', status: 'done' },
+    { id: 'test', name: 'Testing', owner: 'QA Payments', status: 'in-progress' },
+    { id: 'sec', name: 'Security Review', owner: 'SecOps', status: 'blocked' },
+    { id: 'stage', name: 'Staging', owner: 'DevOps', status: 'todo' },
+    { id: 'deploy', name: 'Deploy', owner: 'Release Eng', status: 'todo' },
   ],
   tickets: [
-    { id: "PAY-9812", summary: "Add 3DS2 fallback for EU markets", status: "In Progress" },
-    { id: "PAY-9731", summary: "Refactor chargeback pipeline", status: "To Do" },
-    { id: "PAY-9689", summary: "Optimize ACH retry window", status: "Done" },
+    { id: 'PAY-9812', summary: 'Add 3DS2 fallback for EU markets', status: 'In Progress' },
+    { id: 'PAY-9731', summary: 'Refactor chargeback pipeline', status: 'To Do' },
+    { id: 'PAY-9689', summary: 'Optimize ACH retry window', status: 'Done' },
   ],
-}
+};
 
 const suggestionData = [
   {
-    id: "PAY-9841",
-    summary: "Handle network retries for issuer timeouts",
-    why: "Frequent failures observed in last 7 days; related to current 3DS work.",
+    id: 'PAY-9841',
+    summary: 'Handle network retries for issuer timeouts',
+    why: 'Frequent failures observed in last 7 days; related to current 3DS work.',
   },
   {
-    id: "PAY-9823",
-    summary: "Add observability for risk-scoring anomalies",
-    why: "Spikes in anomaly rate after last deployment; low effort, high impact.",
+    id: 'PAY-9823',
+    summary: 'Add observability for risk-scoring anomalies',
+    why: 'Spikes in anomaly rate after last deployment; low effort, high impact.',
   },
-]
+];
 
 const activity = [
-  { at: "Aug 07, 10:21", who: "SecOps Bot", action: "Security checks queued (SAST, DAST)." },
-  { at: "Aug 06, 16:03", who: "Alex Kim", action: "Moved Testing to In Progress." },
-  { at: "Aug 05, 09:47", who: "QA Payments", action: "Attached test plan v2." },
-  { at: "Aug 04, 11:20", who: "Release Eng", action: "Created release REL-2381." },
-]
+  { at: 'Aug 07, 10:21', who: 'SecOps Bot', action: 'Security checks queued (SAST, DAST).' },
+  { at: 'Aug 06, 16:03', who: 'Alex Kim', action: 'Moved Testing to In Progress.' },
+  { at: 'Aug 05, 09:47', who: 'QA Payments', action: 'Attached test plan v2.' },
+  { at: 'Aug 04, 11:20', who: 'Release Eng', action: 'Created release REL-2381.' },
+];
 
 export default function ReleaseDetailsWidgets({ params }: { params: { id: string } }) {
   const release = useMemo(() => {
-    const releaseId = Array.isArray(params.id) ? params.id[0] : params.id
-    return releaseId === MOCK_RELEASE.id ? MOCK_RELEASE : MOCK_RELEASE
-  }, [params.id])
+    const releaseId = Array.isArray(params.id) ? params.id[0] : params.id;
+    return releaseId === MOCK_RELEASE.id ? MOCK_RELEASE : MOCK_RELEASE;
+  }, [params.id]);
   const [activeStep, setActiveStep] = useState<string>(
-    release?.steps.find((s) => s.status === "in-progress")?.id ?? "ticket",
-  )
-  const [comment, setComment] = useState<string>("")
+    release?.steps.find((s) => s.status === 'in-progress')?.id ?? 'ticket'
+  );
+  const [comment, setComment] = useState<string>('');
 
-  if (!release) return notFound()
+  if (!release) return notFound();
 
-  const completed = release.steps.filter((s) => s.status === "done").length
-  const pct = Math.round((completed / release.steps.length) * 100)
+  const completed = release.steps.filter((s) => s.status === 'done').length;
+  const pct = Math.round((completed / release.steps.length) * 100);
 
-  const active = release.steps.find((s) => s.id === activeStep) ?? release.steps[0]
-
-
-
-
-
-
-
+  const active = release.steps.find((s) => s.id === activeStep) ?? release.steps[0];
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
@@ -120,7 +120,7 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          {active.id === "ticket" ? (
+          {active.id === 'ticket' ? (
             <>
               {/* Included Tickets */}
               <div>
@@ -161,7 +161,13 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
                 </div>
                 <div className="grid sm:grid-cols-2 gap-3">
                   {suggestionData.map((s) => (
-                    <AISuggestionCard key={s.id} id={s.id} summary={s.summary} why={s.why} onAdd={() => { }} />
+                    <AISuggestionCard
+                      key={s.id}
+                      id={s.id}
+                      summary={s.summary}
+                      why={s.why}
+                      onAdd={() => {}}
+                    />
                   ))}
                 </div>
               </div>
@@ -195,8 +201,16 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
                       </TableHeader>
                       <TableBody>
                         {[
-                          { id: "PAY-9901", summary: "Retry logic for 3DS challenge", status: "To Do" },
-                          { id: "PAY-9903", summary: "Alert on chargeback anomalies", status: "In Progress" },
+                          {
+                            id: 'PAY-9901',
+                            summary: 'Retry logic for 3DS challenge',
+                            status: 'To Do',
+                          },
+                          {
+                            id: 'PAY-9903',
+                            summary: 'Alert on chargeback anomalies',
+                            status: 'In Progress',
+                          },
                         ].map((r) => (
                           <TableRow key={r.id}>
                             <TableCell className="font-medium">{r.id}</TableCell>
@@ -217,8 +231,8 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
             </>
           ) : (
             <div className="text-sm text-muted-foreground">
-              Select "Jira Ticket Selection" to manage tickets for this release. Other steps will show their
-              respective details here.
+              Select "Jira Ticket Selection" to manage tickets for this release. Other steps will
+              show their respective details here.
             </div>
           )}
         </CardContent>
@@ -243,7 +257,7 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
                     <div className="h-2.5 w-2.5 rounded-full bg-foreground/70 mt-1.5" />
                     <div>
                       <div className="text-sm">
-                        <span className="font-medium">{a.who}</span>{" "}
+                        <span className="font-medium">{a.who}</span>{' '}
                         <span className="text-muted-foreground">{a.action}</span>
                       </div>
                       <div className="text-xs text-muted-foreground">{a.at}</div>
@@ -263,8 +277,8 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
                   <Button
                     onClick={() => {
                       if (comment.trim()) {
-                        alert("Comment posted (demo)")
-                        setComment("")
+                        alert('Comment posted (demo)');
+                        setComment('');
                       }
                     }}
                   >
@@ -274,10 +288,12 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
                 <Separator />
                 <div className="space-y-2 text-sm">
                   <div>
-                    <span className="font-medium">Alex Kim:</span> Please prioritize SAST results today.
+                    <span className="font-medium">Alex Kim:</span> Please prioritize SAST results
+                    today.
                   </div>
                   <div>
-                    <span className="font-medium">QA Payments:</span> Test plan updated with negative cases.
+                    <span className="font-medium">QA Payments:</span> Test plan updated with
+                    negative cases.
                   </div>
                 </div>
               </div>
@@ -286,5 +302,5 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

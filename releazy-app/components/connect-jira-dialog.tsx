@@ -1,7 +1,7 @@
-"use client"
+'use client';
 
-import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
+import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -10,34 +10,34 @@ import {
   DialogDescription,
   DialogTrigger,
   DialogFooter,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
-import { ShieldQuestion, PlugZap } from "lucide-react"
-import { useJiraConfig } from "@/lib/jira-config"
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { ShieldQuestion, PlugZap } from 'lucide-react';
+import { useJiraConfig } from '@/lib/jira-config';
 
 export function ConnectJiraDialog() {
-  const { baseUrl, email, apiToken, save, clear } = useJiraConfig()
-  const [open, setOpen] = useState(false)
-  const [localBaseUrl, setLocalBaseUrl] = useState(baseUrl)
-  const [localEmail, setLocalEmail] = useState(email)
-  const [localToken, setLocalToken] = useState(apiToken)
+  const { baseUrl, email, apiToken, save, clear } = useJiraConfig();
+  const [open, setOpen] = useState(false);
+  const [localBaseUrl, setLocalBaseUrl] = useState(baseUrl);
+  const [localEmail, setLocalEmail] = useState(email);
+  const [localToken, setLocalToken] = useState(apiToken);
 
   useEffect(() => {
-    setLocalBaseUrl(baseUrl)
-    setLocalEmail(email)
-    setLocalToken(apiToken)
-  }, [baseUrl, email, apiToken])
+    setLocalBaseUrl(baseUrl);
+    setLocalEmail(email);
+    setLocalToken(apiToken);
+  }, [baseUrl, email, apiToken]);
 
-  const connected = !!baseUrl && !!apiToken
+  const connected = !!baseUrl && !!apiToken;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={connected ? "outline" : "default"} className="gap-2">
+        <Button variant={connected ? 'outline' : 'default'} className="gap-2">
           <PlugZap className="size-4" />
-          {connected ? "Jira connected" : "Connect Jira"}
+          {connected ? 'Jira connected' : 'Connect Jira'}
           {connected && <Badge variant="secondary">demo</Badge>}
         </Button>
       </DialogTrigger>
@@ -45,8 +45,8 @@ export function ConnectJiraDialog() {
         <DialogHeader>
           <DialogTitle>Connect Jira</DialogTitle>
           <DialogDescription>
-            For demo use, credentials are stored locally and used for requests. For production, set server environment
-            variables JIRA_BASE_URL, JIRA_EMAIL, JIRA_API_TOKEN.
+            For demo use, credentials are stored locally and used for requests. For production, set
+            server environment variables JIRA_BASE_URL, JIRA_EMAIL, JIRA_API_TOKEN.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-3">
@@ -89,8 +89,8 @@ export function ConnectJiraDialog() {
           </Button>
           <Button
             onClick={() => {
-              save({ baseUrl: localBaseUrl, email: localEmail, apiToken: localToken })
-              setOpen(false)
+              save({ baseUrl: localBaseUrl, email: localEmail, apiToken: localToken });
+              setOpen(false);
             }}
           >
             Save
@@ -98,5 +98,5 @@ export function ConnectJiraDialog() {
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

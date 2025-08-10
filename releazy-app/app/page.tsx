@@ -1,9 +1,9 @@
-import { AppShell } from "@/components/app-shell"
-import { KpiCard } from "@/components/kpi-card"
-import { ChartCard, IssuesBarChart, TrendLineChart, VelocityAreaChart } from "@/components/charts"
-import { CalendarDays, Rocket, ShieldCheck, Bot } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import Image from "next/image"
+import { AppShell } from '@/components/app-shell';
+import { KpiCard } from '@/components/kpi-card';
+import { ChartCard, IssuesBarChart, TrendLineChart, VelocityAreaChart } from '@/components/charts';
+import { CalendarDays, Rocket, ShieldCheck, Bot } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 
 export default function Page() {
   return (
@@ -83,7 +83,9 @@ export default function Page() {
                   </div>
                   <div className="text-sm">
                     <p className="font-medium">Sketch to reality</p>
-                    <p className="text-muted-foreground">Dashboard evolved from the original concept.</p>
+                    <p className="text-muted-foreground">
+                      Dashboard evolved from the original concept.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -92,7 +94,7 @@ export default function Page() {
                   <a href="/releases">Go to Releases</a>
                 </Button>
                 <Button asChild variant="secondary">
-                  <a href="/releases/mv-release-v120-4-0">{"Open MV v120.4.0"}</a>
+                  <a href="/releases/mv-release-v120-4-0">{'Open MV v120.4.0'}</a>
                 </Button>
               </div>
             </div>
@@ -100,9 +102,9 @@ export default function Page() {
         </div>
       </div>
       <p className="sr-only">
-        Images are rendered with Next.js Image component using intrinsic width and height as recommended for optimized
-        loading in the App Router. [^2]
+        Images are rendered with Next.js Image component using intrinsic width and height as
+        recommended for optimized loading in the App Router. [^2]
       </p>
     </AppShell>
-  )
+  );
 }
