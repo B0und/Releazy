@@ -15,9 +15,24 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown, Sparkles } from 'lucide-react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { CheckCircle2, Clock4, PlayCircle, XCircle, ChevronDown, Sparkles } from 'lucide-react';
 import { AISuggestionCard } from '@/components/ai-suggestion-card';
-import { ReleaseStepper, type ReleaseStep } from '@/components/release-stepper';
+// No need to import ReleaseStep anymore
+
+type SubStep = {
+  id: string;
+  name: string;
+  status: 'todo' | 'in-progress' | 'done' | 'blocked';
+};
+
+type WorkflowStep = {
+  id: string;
+  name: string;
+  owner: string;
+  status: 'todo' | 'in-progress' | 'done' | 'blocked';
+  subSteps: SubStep[];
+};
 
 type Release = {
   id: string;
@@ -28,7 +43,7 @@ type Release = {
   start: string;
   target: string;
   risk: 'Low Risk' | 'Medium Risk' | 'High Risk';
-  steps: ReleaseStep[];
+  steps: WorkflowStep[];
   tickets: { id: string; summary: string; status: 'To Do' | 'In Progress' | 'Done' }[];
 };
 
@@ -42,10 +57,50 @@ const MOCK_RELEASE: Release = {
   target: 'Aug 10, 2025',
   risk: 'Medium Risk',
   steps: [
-    { id: 'ticket', name: 'Release creation', owner: 'Alex Kim', status: 'done' },
-    { id: 'dev', name: 'Stabilization', owner: 'Team Payments', status: 'done' },
-    { id: 'test', name: 'Testing', owner: 'QA Payments', status: 'in-progress' },
-    { id: 'sec', name: 'Production deploy', owner: 'SecOps', status: 'blocked' },
+    { 
+      id: 'ticket', 
+      name: 'Release creation', 
+      owner: 'Alex Kim', 
+      status: 'done',
+      subSteps: [
+        { id: 'name', name: 'Release name', status: 'done' },
+        { id: 'jira', name: 'Jira tickets selection', status: 'done' },
+        { id: 'schedule', name: 'Schedule planning', status: 'done' },
+      ]
+    },
+    { 
+      id: 'dev', 
+      name: 'Stabilization', 
+      owner: 'Team Payments', 
+      status: 'done',
+      subSteps: [
+        { id: 'code-freeze', name: 'Code freeze', status: 'done' },
+        { id: 'branch', name: 'Branch creation', status: 'done' },
+        { id: 'build', name: 'Build verification', status: 'done' },
+      ]
+    },
+    { 
+      id: 'test', 
+      name: 'Testing', 
+      owner: 'QA Payments', 
+      status: 'in-progress',
+      subSteps: [
+        { id: 'unit', name: 'Unit tests', status: 'done' },
+        { id: 'integration', name: 'Integration tests', status: 'in-progress' },
+        { id: 'e2e', name: 'E2E tests', status: 'todo' },
+      ]
+    },
+    { 
+      id: 'sec', 
+      name: 'Production deploy', 
+      owner: 'SecOps', 
+      status: 'blocked',
+      subSteps: [
+        { id: 'security', name: 'Security review', status: 'blocked' },
+        { id: 'deploy', name: 'Deployment', status: 'todo' },
+        { id: 'monitor', name: 'Post-deploy monitoring', status: 'todo' },
+      ]
+    },
   ],
   tickets: [
     { id: 'PAY-9812', summary: 'Add 3DS2 fallback for EU markets', status: 'In Progress' },
@@ -69,6 +124,128 @@ const initialSuggestionData = [
 
 // Activity data moved to release-log-dialog component
 
+// WorkflowAccordion component
+function WorkflowAccordion({
+  steps,
+  activeStep,
+  activeSubStep,
+  onSelectStep,
+  onSelectSubStep,
+}: {
+  steps: WorkflowStep[];
+  activeStep: string;
+  activeSubStep: string;
+  onSelectStep: (stepId: string) => void;
+  onSelectSubStep: (stepId: string, subStepId: string) => void;
+}) {
+  return (
+    <Accordion
+      type="single"
+      collapsible
+      className="space-y-2"
+      value={activeStep}
+      onValueChange={(value) => {
+        if (value) {
+          onSelectStep(value);
+          // Auto-select first sub-step when a step is expanded
+          const step = steps.find(s => s.id === value);
+          if (step && step.subSteps.length > 0) {
+            onSelectSubStep(value, step.subSteps[0].id);
+          }
+        }
+      }}
+    >
+      {steps.map((step, idx) => {
+        const Icon =
+          step.status === 'done'
+            ? CheckCircle2
+            : step.status === 'in-progress'
+              ? PlayCircle
+              : step.status === 'blocked'
+                ? XCircle
+                : Clock4;
+
+        const statusColor =
+          step.status === 'done'
+            ? 'text-emerald-600'
+            : step.status === 'in-progress'
+              ? 'text-sky-600'
+              : step.status === 'blocked'
+                ? 'text-rose-600'
+                : 'text-muted-foreground';
+
+        return (
+          <AccordionItem
+            key={step.id}
+            value={step.id}
+            className="border rounded-md overflow-hidden mb-2 last:mb-0"
+          >
+            <AccordionTrigger className="px-3 py-2 hover:no-underline hover:bg-muted/60 data-[state=open]:bg-muted/60">
+              <div className="flex items-start gap-3 w-full">
+                <Icon className={`h-5 w-5 mt-0.5 ${statusColor}`} />
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <div className="font-medium">
+                      {idx + 1}. {step.name}
+                    </div>
+                    <div className="text-xs text-muted-foreground capitalize mr-2">
+                      {step.status.replace('-', ' ')}
+                    </div>
+                  </div>
+                  <div className="text-xs text-muted-foreground">Owner: {step.owner}</div>
+                </div>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-3 pb-2">
+              <div className="pl-8 space-y-2 mt-1">
+                {step.subSteps.map((subStep) => {
+                  const SubStepIcon =
+                    subStep.status === 'done'
+                      ? CheckCircle2
+                      : subStep.status === 'in-progress'
+                        ? PlayCircle
+                        : subStep.status === 'blocked'
+                          ? XCircle
+                          : Clock4;
+
+                  const subStepStatusColor =
+                    subStep.status === 'done'
+                      ? 'text-emerald-600'
+                      : subStep.status === 'in-progress'
+                        ? 'text-sky-600'
+                        : subStep.status === 'blocked'
+                          ? 'text-rose-600'
+                          : 'text-muted-foreground';
+
+                  const isActive = activeStep === step.id && activeSubStep === subStep.id;
+
+                  return (
+                    <button
+                      key={subStep.id}
+                      onClick={() => onSelectSubStep(step.id, subStep.id)}
+                      className={`w-full text-left rounded-md border p-2 transition hover:bg-muted/60 focus:outline-none focus:ring-2 ${
+                        isActive ? 'bg-muted/60 ring-2 ring-primary/40' : 'bg-background'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <SubStepIcon className={`h-4 w-4 ${subStepStatusColor}`} />
+                        <div className="font-medium text-sm">{subStep.name}</div>
+                        <div className="ml-auto text-xs text-muted-foreground capitalize">
+                          {subStep.status.replace('-', ' ')}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        );
+      })}
+    </Accordion>
+  );
+}
+
 export default function ReleaseDetailsWidgets({ params }: { params: { id: string } }) {
   const [release, setRelease] = useState<Release>(() => {
     const releaseId = Array.isArray(params.id) ? params.id[0] : params.id;
@@ -78,10 +255,14 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
   const [activeStep, setActiveStep] = useState<string>(
     release?.steps.find((s) => s.status === 'in-progress')?.id ?? 'ticket'
   );
+  const [activeSubStep, setActiveSubStep] = useState<string>(
+    release?.steps.find((s) => s.id === activeStep)?.subSteps[0]?.id ?? ''
+  );
 
   if (!release) return notFound();
 
   const active = release.steps.find((s) => s.id === activeStep) ?? release.steps[0];
+  const activeSubStepData = active.subSteps.find(s => s.id === activeSubStep) ?? active.subSteps[0];
 
   return (
     <div className="grid gap-6 grid-cols-12">
@@ -92,7 +273,16 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
           <CardDescription>Stages of this release</CardDescription>
         </CardHeader>
         <CardContent>
-          <ReleaseStepper steps={release.steps} activeId={activeStep} onSelect={setActiveStep} />
+          <WorkflowAccordion 
+            steps={release.steps} 
+            activeStep={activeStep} 
+            activeSubStep={activeSubStep}
+            onSelectStep={setActiveStep}
+            onSelectSubStep={(stepId, subStepId) => {
+              setActiveStep(stepId);
+              setActiveSubStep(subStepId);
+            }}
+          />
         </CardContent>
       </Card>
 
@@ -101,13 +291,13 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>{active.name}</CardTitle>
+              <CardTitle>{activeSubStepData ? activeSubStepData.name : active.name}</CardTitle>
               <CardDescription>Owner: {active.owner}</CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          {active.id === 'ticket' ? (
+          {active.id === 'ticket' && activeSubStep === 'jira' ? (
             <>
               {/* Included Tickets */}
               <div>
@@ -268,10 +458,89 @@ export default function ReleaseDetailsWidgets({ params }: { params: { id: string
                 </CollapsibleContent>
               </Collapsible>
             </>
+          ) : active.id === 'ticket' && activeSubStep === 'name' ? (
+            <div className="space-y-4">
+              <div className="font-medium mb-2">Release Name</div>
+              <Input 
+                placeholder="Enter release name" 
+                value={release.name}
+                onChange={(e) => setRelease(prev => ({...prev, name: e.target.value}))}
+                className="max-w-md"
+              />
+              <div className="text-sm text-muted-foreground mt-2">
+                Choose a descriptive name that clearly identifies the purpose of this release.
+              </div>
+            </div>
+          ) : active.id === 'ticket' && activeSubStep === 'schedule' ? (
+            <div className="space-y-4">
+              <div className="font-medium mb-2">Schedule Planning</div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-md">
+                <div>
+                  <div className="text-sm mb-1">Start Date</div>
+                  <Input 
+                    placeholder="Start date" 
+                    value={release.start}
+                    onChange={(e) => setRelease(prev => ({...prev, start: e.target.value}))}
+                  />
+                </div>
+                <div>
+                  <div className="text-sm mb-1">Target Date</div>
+                  <Input 
+                    placeholder="Target date" 
+                    value={release.target}
+                    onChange={(e) => setRelease(prev => ({...prev, target: e.target.value}))}
+                  />
+                </div>
+              </div>
+            </div>
+          ) : active.id === 'dev' ? (
+            <div className="space-y-4">
+              <div className="font-medium mb-2">Stabilization</div>
+              <div className="text-sm text-muted-foreground">
+                {activeSubStep === 'code-freeze' ? (
+                  <div>Code freeze is in effect. All feature development should be complete.</div>
+                ) : activeSubStep === 'branch' ? (
+                  <div>Release branch has been created from main. Only bugfixes are allowed.</div>
+                ) : activeSubStep === 'build' ? (
+                  <div>Build verification is complete. All tests are passing on the release branch.</div>
+                ) : (
+                  <div>Select a sub-step to see details.</div>
+                )}
+              </div>
+            </div>
+          ) : active.id === 'test' ? (
+            <div className="space-y-4">
+              <div className="font-medium mb-2">Testing</div>
+              <div className="text-sm text-muted-foreground">
+                {activeSubStep === 'unit' ? (
+                  <div>Unit tests have passed. Code coverage is at 87%.</div>
+                ) : activeSubStep === 'integration' ? (
+                  <div>Integration tests are in progress. 14/20 test suites have passed.</div>
+                ) : activeSubStep === 'e2e' ? (
+                  <div>E2E tests are pending. Will begin after integration tests complete.</div>
+                ) : (
+                  <div>Select a sub-step to see details.</div>
+                )}
+              </div>
+            </div>
+          ) : active.id === 'sec' ? (
+            <div className="space-y-4">
+              <div className="font-medium mb-2">Production Deploy</div>
+              <div className="text-sm text-muted-foreground">
+                {activeSubStep === 'security' ? (
+                  <div className="text-rose-500">Security review is blocked. Waiting for vulnerability assessment.</div>
+                ) : activeSubStep === 'deploy' ? (
+                  <div>Deployment is pending security review approval.</div>
+                ) : activeSubStep === 'monitor' ? (
+                  <div>Post-deployment monitoring will begin after successful deployment.</div>
+                ) : (
+                  <div>Select a sub-step to see details.</div>
+                )}
+              </div>
+            </div>
           ) : (
             <div className="text-sm text-muted-foreground">
-              Select &quot;Jira Ticket Selection&quot; to manage tickets for this release. Other steps will
-              show their respective details here.
+              Select a workflow step and sub-step to see details.
             </div>
           )}
         </CardContent>
