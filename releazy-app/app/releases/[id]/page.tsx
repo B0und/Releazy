@@ -28,6 +28,7 @@ import {
 import { useParams } from "next/navigation"
 import { useMemo, useState } from "react"
 import { ReleaseStepper } from "@/components/release-stepper"
+import ReleaseDetailsWidgets from "@/components/ReleaseDetailsWidgets"
 
 type Ticket = {
   id: string
@@ -139,9 +140,11 @@ export default function ReleaseDetailPage() {
 
         {/* Main grid: Pipeline | Jira selection workbench (single list) */}
         <div className="grid flex-1 min-h-0 gap-4 lg:grid-cols-[280px_1fr]">
-        <ReleaseStepper steps={[{id: "1", name: }]} />
+        <ReleaseDetailsWidgets params={{
+            id: "123"
+          }}  />
         <div />
-        </div>
+      
       </div>
     </AppShell>
   )

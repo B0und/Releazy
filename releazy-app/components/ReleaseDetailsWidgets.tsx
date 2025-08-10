@@ -93,11 +93,11 @@ export default function ReleaseDetails({ params }: { params: { id: string } }) {
   }[release.risk]
 
   return (
-    <div className="w-full min-h-screen p-4 md:p-6">
+    <>
       {/* Top meta info row */}
-      <div className="grid gap-4 md:grid-cols-3">
+    
         {/* Pane 1: Static context */}
-        <Card>
+        {/* <Card>
           <CardHeader>
             <div className="flex items-start justify-between">
               <div>
@@ -157,7 +157,7 @@ export default function ReleaseDetails({ params }: { params: { id: string } }) {
               <div className="text-xs text-muted-foreground">Testing — 2d 11h</div>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Pane 2: Visual workflow */}
         <Card>
@@ -284,10 +284,10 @@ export default function ReleaseDetails({ params }: { params: { id: string } }) {
             )}
           </CardContent>
         </Card>
-      </div>
+    
 
       {/* Below panes: Activity & Comments */}
-      <div className="mt-6">
+      {/* <div className="mt-6">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle>History & Collaboration</CardTitle>
@@ -348,7 +348,7 @@ export default function ReleaseDetails({ params }: { params: { id: string } }) {
             </Tabs>
           </CardContent>
         </Card>
-      </div>
-    </div>
+      </div> */}
+    </>
   )
 }
