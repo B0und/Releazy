@@ -30,7 +30,7 @@ export function ChartCard({ title = 'Chart', description = '', children }: Chart
         <CardTitle className="text-base">{title}</CardTitle>
         {description ? <p className="text-sm text-muted-foreground">{description}</p> : null}
       </CardHeader>
-      <CardContent className="h-[220px]">{children}</CardContent>
+      <CardContent className="h-[220px] pl-0">{children}</CardContent>
     </Card>
   );
 }
@@ -47,10 +47,10 @@ export function IssuesBarChart() {
   ];
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <BarChart data={data}>
+      <BarChart data={data} margin={{ left: 0 }}>
         <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} />
-        <XAxis dataKey="name" stroke="currentColor" opacity={0.6} />
-        <YAxis stroke="currentColor" opacity={0.4} />
+        <XAxis dataKey="name" stroke="currentColor" opacity={0.6} fontSize={10} />
+        <YAxis stroke="currentColor" opacity={0.4} fontSize={10} />
         <Tooltip cursor={{ fill: 'hsl(var(--accent))' }} />
         <Bar dataKey="created" fill="hsl(262 83% 58%)" radius={[6, 6, 0, 0]} />
         <Bar dataKey="closed" fill="hsl(292 84% 61%)" radius={[6, 6, 0, 0]} />
@@ -67,7 +67,7 @@ export function VelocityAreaChart() {
   }));
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <AreaChart data={data}>
+      <AreaChart data={data} margin={{ left: 0 }}>
         <defs>
           <linearGradient id="grad1" x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor="hsl(262 83% 58%)" stopOpacity={0.35} />
@@ -79,8 +79,8 @@ export function VelocityAreaChart() {
           </linearGradient>
         </defs>
         <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} />
-        <XAxis dataKey="day" stroke="currentColor" opacity={0.6} />
-        <YAxis stroke="currentColor" opacity={0.4} />
+        <XAxis dataKey="day" stroke="currentColor" opacity={0.6} fontSize={10} />
+        <YAxis stroke="currentColor" opacity={0.4} fontSize={10} />
         <Tooltip />
         <Area
           type="monotone"
@@ -108,10 +108,10 @@ export function TrendLineChart() {
   }));
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <LineChart data={data}>
+      <LineChart data={data} margin={{ left: 0 }}>
         <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} />
         <XAxis dataKey="hour" stroke="currentColor" opacity={0.6} hide />
-        <YAxis stroke="currentColor" opacity={0.4} />
+        <YAxis stroke="currentColor" opacity={0.4} fontSize={10} />
         <Tooltip />
         <Line
           type="monotone"

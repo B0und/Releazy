@@ -33,16 +33,14 @@ export default function ReleaseDetailPage() {
               <span className="sr-only">Open menu</span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="p-1.5">
             <DropdownMenuItem 
               variant="destructive"
               onClick={() => console.log('Cancel release clicked')}
-              className="hover:bg-red-100 dark:hover:bg-red-900/20"
+              className="py-2.5 px-3"
             >
-              <div className="flex items-center gap-2 w-full">
-                <XCircle className="h-4 w-4" />
-                <span>Cancel Release</span>
-              </div>
+              <XCircle className="h-4 w-4" />
+              <span className="text-sm">Cancel Release</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
@@ -56,9 +54,9 @@ export default function ReleaseDetailPage() {
                   { at: 'Aug 04, 11:20', who: 'Release Eng', action: `Created release ${Array.isArray(id) ? id[0] : id}.` },
                 ]}
               >
-                <div className="flex items-center gap-2 w-full hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-sm px-2 py-1.5">
+                <div className="flex items-center gap-2 w-full py-2.5 px-3 transition-colors hover:text-blue-600 dark:hover:text-blue-400">
                   <ClipboardList className="h-4 w-4 text-blue-500" />
-                  <span>Release Log</span>
+                  <span className="text-sm">Release Log</span>
                 </div>
               </ReleaseLogDialog>
             </DropdownMenuItem>
